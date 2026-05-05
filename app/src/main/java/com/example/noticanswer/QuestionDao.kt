@@ -76,4 +76,26 @@ interface QuestionDao {
 
     @Query("SELECT * FROM questions WHERE folderId IN (:folderIds)")
     suspend fun getQuestionsByFolderIds(folderIds: List<Long>): List<QuestionEntity>
+
+    @Query("SELECT COUNT(*) FROM questions WHERE folderId = :folderId")
+    suspend fun getQuestionCountByFolder(folderId: Long): Int
+
+    @Query("""
+    SELECT COUNT(*)
+    FROM questions
+    WHERE folderId IN (
+        SELECT id FROM question_folders WHERE parentFolderId = :genreId
+    )
+""")
+    suspend fun getQuestionCountByGenre(genreId: Long): Int
+
+    @Query("""
+UPDATE questions
+SET show_image = :showImageInNotification
+WHERE id = :id
+""")
+    suspend fun updateShowImage(
+        id: Int,
+        showImageInNotification: Boolean
+    )
 }

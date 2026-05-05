@@ -3,6 +3,7 @@ package com.example.noticanswer
 import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.ColumnInfo
 
 @Entity(tableName = "questions")
 data class QuestionEntity(
@@ -17,7 +18,10 @@ data class QuestionEntity(
     val explanation: String = "",
     val imageResName: String,
     val imagePath: String = "",
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+
+    @ColumnInfo(name = "show_image")
+    val showImageInNotification: Boolean = false
 )
 
 fun QuestionEntity.toQuestion(context: Context): Question {
@@ -44,6 +48,7 @@ fun QuestionEntity.toQuestion(context: Context): Question {
         imageResId = imageResId,
         imageResName = imageResName,
         imagePath = imagePath,
-        enabled = enabled
+        enabled = enabled,
+        showImageInNotification = showImageInNotification
     )
 }

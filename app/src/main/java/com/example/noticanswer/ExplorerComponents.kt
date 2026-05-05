@@ -144,6 +144,21 @@ fun FolderListRow(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
+                val countText = if (item.childFolderCount > 0) {
+                    "${item.childFolderCount}ファイル / ${item.questionCount}問"
+                } else {
+                    "${item.questionCount}問"
+                }
+
+                Text(
+                    text = countText,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 StatRow(
                     total = item.total,
                     rate = item.rate

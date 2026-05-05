@@ -10,5 +10,6 @@ data class Question(
     val imageResId: Int,
     val imageResName: String = "",
     val imagePath: String = "",
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+    val showImageInNotification: Boolean = false
 )

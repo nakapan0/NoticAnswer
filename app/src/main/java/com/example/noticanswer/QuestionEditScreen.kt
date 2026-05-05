@@ -28,6 +28,10 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Switch
+import androidx.compose.ui.Alignment
 
 @Composable
 fun QuestionEditScreen(
@@ -48,6 +52,7 @@ fun QuestionEditScreen(
     var explanation by remember { mutableStateOf("") }
     var imageResName by remember { mutableStateOf("") }
     var imagePath by remember { mutableStateOf("") }
+    var showImageInNotification by remember { mutableStateOf(false) }
 
     LaunchedEffect(questionId) {
         val question = QuestionRepository.findById(context, questionId)
@@ -65,6 +70,7 @@ fun QuestionEditScreen(
         imageResName = question.imageResName
         loaded = true
         imagePath = question.imagePath
+        showImageInNotification = question.showImageInNotification
     }
 
     if (showDeleteDialog) {
@@ -119,6 +125,7 @@ fun QuestionEditScreen(
                     context = context,
                     sourceUri = uri
                 )
+                showImageInNotification = true
                 statusMessage = "画像を変更しました"
             } catch (_: Exception) {
                 statusMessage = "画像の保存に失敗しました"
@@ -155,13 +162,32 @@ fun QuestionEditScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                imagePickerLauncher.launch("image/*")
-            }
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("画像を選択")
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    imagePickerLauncher.launch("image/*")
+                }
+            ) {
+                Text("画像を選択")
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Text("通知表示")
+
+            Switch(
+                checked = imagePath.isNotBlank() && showImageInNotification,
+                onCheckedChange = {
+                    if (imagePath.isNotBlank()) {
+                        showImageInNotification = it
+                    }
+                },
+                enabled = imagePath.isNotBlank()
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -222,7 +248,8 @@ fun QuestionEditScreen(
                         aliasesText = aliasesText.trim(),
                         explanation = explanation.trim(),
                         imageResName = imageResName,
-                        imagePath = imagePath
+                        imagePath = imagePath,
+                        showImageInNotification = imagePath.isNotBlank() && showImageInNotification
                     )
                     onSaved()
                 }

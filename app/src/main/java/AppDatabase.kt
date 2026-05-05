@@ -11,7 +11,7 @@ import androidx.room.RoomDatabase
         QuestionEntity::class,
         QuestionFolderEntity::class
     ],
-    version = 8
+    version = 9
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -30,6 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "notic_answer_database"
                 )
+                    .addMigrations(MIGRATION_8_9)
                     .build()
 
                 INSTANCE = instance

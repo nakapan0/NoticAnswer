@@ -61,10 +61,14 @@ suspend fun showNotification(context: Context) {
         .addRemoteInput(remoteInput)
         .build()
 
-    val bitmap = loadQuestionBitmap(
-        context = context,
-        question = question
-    )
+    val bitmap = if (question.showImageInNotification) {
+        loadQuestionBitmap(
+            context = context,
+            question = question
+        )
+    } else {
+        null
+    }
 
     val builder = NotificationCompat.Builder(context, channelId)
         .setContentTitle(question.promptText)

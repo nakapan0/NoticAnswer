@@ -80,7 +80,8 @@ object QuestionRepository {
         explanation: String,
         imageResName: String,
         imagePath: String = "",
-        enabled: Boolean = true
+        enabled: Boolean = true,
+        showImageInNotification: Boolean
     ) {
         seedIfEmpty(context)
 
@@ -97,7 +98,8 @@ object QuestionRepository {
                 explanation = explanation,
                 imageResName = imageResName,
                 imagePath = imagePath,
-                enabled = enabled
+                enabled = enabled,
+                showImageInNotification = showImageInNotification
             )
         )
     }
@@ -110,7 +112,9 @@ object QuestionRepository {
         aliasesText: String,
         explanation: String,
         imageResName: String,
-        imagePath: String = ""
+        imagePath: String = "",
+        showImageInNotification: Boolean
+
     ) {
         seedIfEmpty(context)
 
@@ -139,6 +143,10 @@ object QuestionRepository {
                 imagePath = oldQuestion.imagePath
             )
         }
+        questionDao.updateShowImage(
+            id = questionId,
+            showImageInNotification = showImageInNotification
+        )
     }
 
     suspend fun deleteQuestion(

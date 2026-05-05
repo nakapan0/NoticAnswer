@@ -346,17 +346,24 @@ private suspend fun loadGenreItems(
 ): List<FolderDisplayItem> {
     val db = AppDatabase.getDatabase(context)
     val answerLogDao = db.answerLogDao()
+    val folderDao = db.questionFolderDao()
+    val questionDao = db.questionDao()
 
     return QuestionRepository.getGenres(context).map { folder ->
         val total = answerLogDao.getCountByFolder(folder.id)
         val correct = answerLogDao.getCorrectCountByFolder(folder.id)
         val rate = if (total == 0) 0 else correct * 100 / total
 
+        val childFolderCount = folderDao.getChildFolderCount(folder.id)
+        val questionCount = questionDao.getQuestionCountByGenre(folder.id)
+
         FolderDisplayItem(
             folder = folder,
             total = total,
             correct = correct,
-            rate = rate
+            rate = rate,
+            childFolderCount = childFolderCount,
+            questionCount = questionCount
         )
     }
 }

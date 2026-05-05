@@ -105,6 +105,7 @@ suspend fun exportGenreToZip(
                         .put("enabled", question.enabled)
                         .put("imageFileName", imageFileName)
                         .put("imageResName", question.imageResName)
+                        .put("showImageInNotification", question.showImageInNotification)
                 )
             }
         }
@@ -268,7 +269,11 @@ suspend fun importGenreZipAsNewGenre(
                 explanation = questionJson.optString("explanation", ""),
                 imageResName = questionJson.optString("imageResName", ""),
                 imagePath = imagePath,
-                enabled = questionJson.optBoolean("enabled", true)
+                enabled = questionJson.optBoolean("enabled", true),
+                showImageInNotification = questionJson.optBoolean(
+                    "showImageInNotification",
+                    imagePath.isNotBlank()
+                )
             )
         }
     }

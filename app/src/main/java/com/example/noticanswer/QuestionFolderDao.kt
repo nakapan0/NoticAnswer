@@ -57,4 +57,7 @@ interface QuestionFolderDao {
 
     @Query("DELETE FROM question_folders WHERE id IN (:folderIds)")
     suspend fun deleteFoldersByIds(folderIds: List<Long>)
+
+    @Query("SELECT COUNT(*) FROM question_folders WHERE parentFolderId = :folderId")
+    suspend fun getChildFolderCount(folderId: Long): Int
 }
