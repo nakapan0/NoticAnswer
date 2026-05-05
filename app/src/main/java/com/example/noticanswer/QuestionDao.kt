@@ -64,6 +64,15 @@ interface QuestionDao {
         imageResName: String,
         imagePath: String
     )
+    @Query("""
+        UPDATE questions
+        SET show_image = :showImageInNotification
+        WHERE id = :id
+    """)
+    suspend fun updateShowImage(
+        id: Int,
+        showImageInNotification: Boolean
+    )
 
     @Query("DELETE FROM questions WHERE id = :id")
     suspend fun deleteQuestionById(id: Int)
@@ -88,14 +97,4 @@ interface QuestionDao {
     )
 """)
     suspend fun getQuestionCountByGenre(genreId: Long): Int
-
-    @Query("""
-UPDATE questions
-SET show_image = :showImageInNotification
-WHERE id = :id
-""")
-    suspend fun updateShowImage(
-        id: Int,
-        showImageInNotification: Boolean
-    )
 }
