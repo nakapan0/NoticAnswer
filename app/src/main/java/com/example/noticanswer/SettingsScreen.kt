@@ -41,6 +41,7 @@ fun SettingsScreen(
     var startHourText by remember { mutableStateOf("10") }
     var endHourText by remember { mutableStateOf("22") }
     var countText by remember { mutableStateOf("3") }
+    var questionsPerSessionText by remember { mutableStateOf("1") }
     var minIntervalText by remember { mutableStateOf("30") }
 
     var statusMessage by remember { mutableStateOf("") }
@@ -56,6 +57,7 @@ fun SettingsScreen(
         startHourText = settings.startHour.toString()
         endHourText = settings.endHour.toString()
         countText = settings.count.toString()
+        questionsPerSessionText = settings.questionsPerSession.toString()
         minIntervalText = settings.minIntervalMinutes.toString()
         quietHoursEnabled = settings.quietHoursEnabled
         quietStartHourText = settings.quietStartHour.toString()
@@ -130,6 +132,17 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
+            value = questionsPerSessionText,
+            onValueChange = { questionsPerSessionText = it },
+            label = { Text("1回あたりの問題数（1〜10）") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
             value = minIntervalText,
             onValueChange = { minIntervalText = it },
             label = { Text("最低間隔（分）") },
@@ -192,6 +205,7 @@ fun SettingsScreen(
                     startHourText = startHourText,
                     endHourText = endHourText,
                     countText = countText,
+                    questionsPerSessionText = questionsPerSessionText,
                     minIntervalText = minIntervalText,
                     autoEnabled = autoEnabled,
                     quietHoursEnabled = quietHoursEnabled,

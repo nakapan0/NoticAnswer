@@ -5,8 +5,8 @@ data class NotificationSettings(
     val startHour: Int = 10,
     val endHour: Int = 22,
     val count: Int = 3,
+    val questionsPerSession: Int = 1,
     val minIntervalMinutes: Int = 30,
-
     val quietHoursEnabled: Boolean = false,
     val quietStartHour: Int = 22,
     val quietEndHour: Int = 6

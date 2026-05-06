@@ -17,7 +17,11 @@ class NotificationWorker(
                 return Result.success()
             }
 
-            showNotification(applicationContext)
+            showNotification(
+                context = applicationContext,
+                questionsPerSession = settings.questionsPerSession
+            )
+
             Result.success()
         } catch (_: Exception) {
             Result.success()

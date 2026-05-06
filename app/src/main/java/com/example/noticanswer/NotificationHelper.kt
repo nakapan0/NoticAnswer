@@ -14,11 +14,15 @@ import androidx.core.app.RemoteInput
 import androidx.core.content.ContextCompat
 
 @SuppressLint("MissingPermission")
-suspend fun showNotification(context: Context) {
+suspend fun showNotification(
+    context: Context,
+    questionsPerSession: Int = 1,
+    remainingQuestions: Int = questionsPerSession,
+    sessionIndex: Int = 1,
+    sessionTotal: Int = questionsPerSession
+) {
     val channelId = ReplyReceiver.CHANNEL_ID
-
-    val manager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     val channel = NotificationChannel(
         channelId,
@@ -27,7 +31,8 @@ suspend fun showNotification(context: Context) {
     )
     manager.createNotificationChannel(channel)
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+    if (
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
         ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.POST_NOTIFICATIONS
@@ -35,6 +40,10 @@ suspend fun showNotification(context: Context) {
     ) {
         return
     }
+
+    val safeTotal = sessionTotal.coerceIn(1, 10)
+    val safeRemaining = remainingQuestions.coerceIn(1, safeTotal)
+    val safeIndex = sessionIndex.coerceIn(1, safeTotal)
 
     val question = QuestionRepository.getRandomQuestion(context)
 
@@ -44,11 +53,14 @@ suspend fun showNotification(context: Context) {
 
     val intent = Intent(context, ReplyReceiver::class.java).apply {
         putExtra(ReplyReceiver.EXTRA_QUESTION_ID, question.id)
+        putExtra(ReplyReceiver.EXTRA_REMAINING_QUESTIONS, safeRemaining)
+        putExtra(ReplyReceiver.EXTRA_SESSION_INDEX, safeIndex)
+        putExtra(ReplyReceiver.EXTRA_SESSION_TOTAL, safeTotal)
     }
 
     val pendingIntent = PendingIntent.getBroadcast(
         context,
-        question.id,
+        question.id + safeIndex * 10000,
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
     )
@@ -70,8 +82,14 @@ suspend fun showNotification(context: Context) {
         null
     }
 
+    val title = if (safeTotal > 1) {
+        "第${safeIndex}/${safeTotal}問：${question.promptText}"
+    } else {
+        question.promptText
+    }
+
     val builder = NotificationCompat.Builder(context, channelId)
-        .setContentTitle(question.promptText)
+        .setContentTitle(title)
         .setContentText("通知上で回答してください")
         .setSmallIcon(android.R.drawable.ic_dialog_info)
         .addAction(action)
