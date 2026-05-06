@@ -71,6 +71,26 @@ object QuestionRepository {
             .updateEnabled(questionId, enabled)
     }
 
+    suspend fun moveQuestionToFolder(
+        context: Context,
+        questionId: Int,
+        newFolderId: Long
+    ) {
+        seedIfEmpty(context)
+
+        val db = AppDatabase.getDatabase(context)
+        val targetFolder = db.questionFolderDao().findById(newFolderId)
+
+        if (targetFolder?.kind != FolderKind.SUB_GENRE) {
+            error("移動先がサブジャンルではありません")
+        }
+
+        db.questionDao().moveQuestionToFolder(
+            questionId = questionId,
+            newFolderId = newFolderId
+        )
+    }
+
     suspend fun addQuestion(
         context: Context,
         folderId: Long,

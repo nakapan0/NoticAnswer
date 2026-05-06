@@ -208,7 +208,7 @@ fun QuestionListRow(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp)
+            .padding(vertical = 4.dp)
             .clickable {
                 if (!deleteMode) {
                     onClick()
@@ -220,12 +220,12 @@ fun QuestionListRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(width = 78.dp, height = 58.dp)
+                    .size(width = 68.dp, height = 48.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .border(
                         width = 1.dp,
@@ -236,39 +236,35 @@ fun QuestionListRow(
             ) {
                 QuestionImagePreviewBox(
                     question = item.question,
-                    modifier = Modifier.size(width = 78.dp, height = 58.dp)
+                    modifier = Modifier.size(width = 68.dp, height = 48.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = item.question.correctAnswer,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(0.45f)
-                    )
+                Text(
+                    text = item.question.promptText,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-                    Text(
-                        text = item.question.promptText,
-                        fontSize = 14.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(0.55f)
-                    )
-                }
+                Text(
+                    text = item.question.correctAnswer,
+                    fontSize = 11.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
                 StatRow(
                     total = item.total,
@@ -276,7 +272,7 @@ fun QuestionListRow(
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.dp))
 
             Checkbox(
                 checked = item.question.enabled,
@@ -292,9 +288,7 @@ fun QuestionListRow(
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .width(40.dp)
-                        .clickable {
-                            onDelete()
-                        }
+                        .clickable { onDelete() }
                 )
             }
         }

@@ -37,6 +37,12 @@ interface QuestionDao {
     @Query("UPDATE questions SET enabled = :enabled WHERE id = :id")
     suspend fun updateEnabled(id: Int, enabled: Boolean)
 
+    @Query("UPDATE questions SET folderId = :newFolderId WHERE id = :questionId")
+    suspend fun moveQuestionToFolder(
+        questionId: Int,
+        newFolderId: Long
+    )
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(question: QuestionEntity)
 

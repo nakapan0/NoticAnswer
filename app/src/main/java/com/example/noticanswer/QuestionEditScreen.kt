@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Switch
 import androidx.compose.ui.Alignment
+import android.content.Context
 
 @Composable
 fun QuestionEditScreen(
@@ -54,6 +55,10 @@ fun QuestionEditScreen(
     var imagePath by remember { mutableStateOf("") }
     var showImageInNotification by remember { mutableStateOf(false) }
 
+    var currentFolderId by remember { mutableStateOf<Long?>(null) }
+    var moveTargets by remember { mutableStateOf<List<QuestionMoveTarget>>(emptyList()) }
+    var showMoveDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(questionId) {
         val question = QuestionRepository.findById(context, questionId)
 
@@ -68,9 +73,11 @@ fun QuestionEditScreen(
         aliasesText = question.aliases.joinToString("|")
         explanation = question.explanation
         imageResName = question.imageResName
-        loaded = true
         imagePath = question.imagePath
         showImageInNotification = question.showImageInNotification
+        currentFolderId = question.folderId
+        moveTargets = loadQuestionMoveTargets(context)
+        loaded = true
     }
 
     if (showDeleteDialog) {
@@ -108,6 +115,62 @@ fun QuestionEditScreen(
                 TextButton(onClick = {
                     showDeleteDialog = false
                 }) {
+                    Text("キャンセル")
+                }
+            }
+        )
+    }
+
+    if (showMoveDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showMoveDialog = false
+            },
+            title = {
+                Text("移動先を選択")
+            },
+            text = {
+                Column {
+                    if (moveTargets.isEmpty()) {
+                        Text("移動できるサブジャンルがありません")
+                    } else {
+                        moveTargets.forEach { target ->
+                            val isCurrent = target.subGenre.id == currentFolderId
+
+                            TextButton(
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = !isCurrent,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        QuestionRepository.moveQuestionToFolder(
+                                            context = context,
+                                            questionId = questionId,
+                                            newFolderId = target.subGenre.id
+                                        )
+
+                                        currentFolderId = target.subGenre.id
+                                        showMoveDialog = false
+                                        statusMessage =
+                                            "移動しました: ${target.genreName} / ${target.subGenre.name}"
+                                    }
+                                }
+                            ) {
+                                Text(
+                                    text = "${target.genreName} / ${target.subGenre.name}" +
+                                            if (isCurrent) "（現在）" else ""
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showMoveDialog = false
+                    }
+                ) {
                     Text("キャンセル")
                 }
             }
@@ -260,6 +323,32 @@ fun QuestionEditScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        val currentMoveTarget = moveTargets.firstOrNull {
+            it.subGenre.id == currentFolderId
+        }
+
+        Text(
+            text = "現在の保存先: " + (
+                    currentMoveTarget?.let {
+                        "${it.genreName} / ${it.subGenre.name}"
+                    } ?: "読み込み中"
+                    )
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = moveTargets.size > 1,
+            onClick = {
+                showMoveDialog = true
+            }
+        ) {
+            Text("保存先を変更")
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
@@ -276,5 +365,26 @@ fun QuestionEditScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(statusMessage)
+    }
+}
+
+private data class QuestionMoveTarget(
+    val subGenre: QuestionFolderEntity,
+    val genreName: String
+)
+
+private suspend fun loadQuestionMoveTargets(
+    context: Context
+): List<QuestionMoveTarget> {
+    return QuestionRepository.getGenres(context).flatMap { genre ->
+        QuestionRepository.getSubGenres(
+            context = context,
+            genreId = genre.id
+        ).map { subGenre ->
+            QuestionMoveTarget(
+                subGenre = subGenre,
+                genreName = genre.name
+            )
+        }
     }
 }
